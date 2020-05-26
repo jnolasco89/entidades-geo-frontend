@@ -1,24 +1,43 @@
 import Axios from '../axiosConfig';
 import Geo from './DepMun';
 
-export default class Servicios{
-    async subirArchivo(archivo){
-        let formData=new FormData();
-        formData.append('documento',archivo);
-        var response=await Axios.post('/subir-excel',formData,{headers:{'Content-Type':'multipart/form-data'}});
+export default class Servicios {
+    async subirArchivo(archivo) {
+        let formData = new FormData();
+        formData.append('documento', archivo);
+        var response = await Axios.post('/subir-excel', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
         return response;
     }
 
-    async getAllEntidades(){
-        var response=await Axios.get('/entidades');
+    async getAllEntidades() {
+        var response = await Axios.get('/entidades');
         return response;
     }
 
-    test(){
+    async getReporteEntidad(id) {
+        var response = await Axios.get('/reporte-entidad', {
+            responseType:'blob',
+            params: {
+                id: id
+            }
+        });
+        return response;
+    }
+
+    async getCatalogo(catalogo){
+        var response = await Axios.get('/catalogo', {
+            params: {
+                catalogo: catalogo
+            }
+        });
+        return response;
+    }
+
+    test() {
         alert("Llega a test");
     }
 
-    getDepartamentos(){
+    getDepartamentos() {
         let deptos = [];
         Geo.Departamento.forEach(depto => {
             if (depto.DEP_ID * 1 > 0) {
@@ -26,7 +45,7 @@ export default class Servicios{
                 deptos.push(depto);
             }
         });
-        return deptos;   
+        return deptos;
     }
 
     getMunicipios(idDepto) {

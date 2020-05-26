@@ -1,15 +1,16 @@
 <template>
-  <layout></layout>
+  <router-view></router-view>
 </template>
 
 <script>
-import Layout from "./vistas/Layout";
 
 export default {
-  name: "App",
-  components: {
-    Layout
-  }
+  name: "App"
 };
 </script>
-
+<style>
+.theme--light.v-chip:not(.v-chip--active){
+  background-color: #3f51b5!important;
+  color: white!important;
+}
+</style>

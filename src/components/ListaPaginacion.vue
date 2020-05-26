@@ -1,47 +1,52 @@
 <template>
-  <v-card outlined>
+  <v-card :color="config.color" outlined>
     <v-card-title>{{config.titulo}}</v-card-title>
     <v-card-text>
-      <v-list dense>
-        <template v-if="datos.length==0">
+      <v-list>
+        <template v-if="items.length==0">
           <v-list-item>
             <v-list-item-content>
-              <v-alert type="info">
-                Sin datos que mostrar
-              </v-alert>
+              <v-alert type="info">Sin datos que mostrar</v-alert>
             </v-list-item-content>
           </v-list-item>
         </template>
-        <template v-for="(dato, index) in datos" v-else-if="datos.length>0">
-          <v-divider :key="`divider-${index}`" inset="inset"></v-divider>
-          <v-list-item :key="`listitem-${index}`">
+        <template v-else>
+          <v-row justify="center">
+            <v-col
+              v-for="(encabezado,indexEncabezado) in config.encabezados"
+              :key="`titulos-${indexEncabezado}-${encabezado.nombre}`"
+              :xs="encabezado.anchos.xs"
+              :sm="encabezado.anchos.sm"
+              :md="encabezado.anchos.md"
+              :lg="encabezado.anchos.lg"
+              :xl="encabezado.anchos.xl"
+            >{{encabezado.texto}}</v-col>
+          </v-row>
+          <v-list-item v-for="(item,indexFila) in items" :key="`item-paginacion-${indexFila}`">
             <v-list-item-avatar v-if="config.itemAvatar.ver">
-              <v-icon>{{config.itemAvatar.icono}}</v-icon>
+              <v-icon color="indigo">{{config.itemAvatar.icono}}</v-icon>
             </v-list-item-avatar>
-
             <v-list-item-content>
-              <v-row no-gutters>
+              <hr />
+              <v-row no-gutters class="fila-paginacion">
                 <v-col
-                  :cols="encabezado.ancho"
-                  v-for="(encabezado, index) in config.encabezados"
-                  :key="`columna-${encabezado.valor}-${index}`"
+                  v-for="(encabezado,indexEncabezado) in config.encabezados"
+                  :key="`${indexFila}-${indexEncabezado}-${encabezado.nombre}`"
+                  :xs="encabezado.anchos.xs"
+                  :sm="encabezado.anchos.sm"
+                  :md="encabezado.anchos.md"
+                  :lg="encabezado.anchos.lg"
+                  :xl="encabezado.anchos.xl"
                 >
-                  <v-list-item-title>{{encabezado.texto}}</v-list-item-title>
-                  <v-list-item-content>
-                    <slot
-                      name="contenido"
-                      v-bind:item="{encabezado:{index:index,texto:encabezado.texto},data:dato}"
-                    >{{dato}}</slot>
-                  </v-list-item-content>
+                  <slot :name="encabezado.nombre" v-bind="{item,encabezado,indexFila}"></slot>
                 </v-col>
               </v-row>
             </v-list-item-content>
-            <v-divider vertical></v-divider>
-            <v-list-item-action>
-              <v-btn icon>
-                <v-icon>edit</v-icon>
-              </v-btn>
+            <!--
+            <v-list-item-action v-if="config.itemAccion.ver">
+              <slot name="acciones" v-bind:item="item"></slot>
             </v-list-item-action>
+            -->
           </v-list-item>
         </template>
       </v-list>
@@ -55,32 +60,31 @@ export default {
       type: Object,
       default() {
         return {
-          titulo: "Lista",
-          encabezados: [
-            { texto: "Datos personales", valor: "datosPersonales", ancho: 5 },
-            { texto: "Telefono(s)", valor: "telefonos", ancho: 2 },
-            { texto: "Correo(s)", valor: "correos", ancho: 5 }
-          ],
+          titulo: "Sedes entidad",
+          color: null,
+          encabezados: [],
           itemAvatar: {
-            ver: true,
-            icono: "person"
+            ver: false,
+            icono: null
+          },
+          itemAccion: {
+            ver: false
           }
         };
       }
     },
-    datos: {
+    items: {
       type: Array,
       default() {
         return [];
-      }
-    },
-    methods: {
-      editarItem: function() {
-        alert("clic");
-        //alert(JSON.stringify(item));
-        //this.$emit('editarItem',item);
       }
     }
   }
 };
 </script>
+<style>
+.fila-paginacion .col {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+</style>

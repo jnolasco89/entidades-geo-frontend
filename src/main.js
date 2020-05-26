@@ -3,6 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import vuetify from './vuetifyConfig'
+import router from './routerConfig'
 import {ValidationObserver, ValidationProvider, localize, extend} from 'vee-validate'
 import * as rules from 'vee-validate/dist/rules'
 import es from 'vee-validate/dist/locale/es.json'
@@ -23,6 +24,6 @@ Vue.component('ValidationProvider',ValidationProvider);
 /* eslint-disable no-new */
 new Vue({
   vuetify,
-
+  router,
   render: h => h(App)
 }).$mount('#app')

@@ -2,7 +2,6 @@
   <v-row>
     <v-col cols="12">
       <v-card outlined>
-        <v-card-title>{{textoFormulario}}</v-card-title>
         <v-card-text>
           <ValidationObserver ref="formDatosContacto" v-slot="{ validate, reset }">
             <form @reset.prevent="reset">
@@ -92,44 +91,82 @@
       </v-card>
     </v-col>
     <v-col cols="12">
-      <lista-paginacion :datos="contactos" :config="configLista">
-        <template slot="contenido" slot-scope="propiedades">
-          <div v-if="propiedades.item.encabezado.index==0">
-            <v-list-item-content>
-              <h4 style="font-weight: 400;">{{propiedades.item.data.nombreCompleto}}</h4>
-              <v-list-item-subtitle>{{propiedades.item.data.cargo}}</v-list-item-subtitle>
-            </v-list-item-content>
-          </div>
-          <div v-else-if="propiedades.item.encabezado.index==1">
-            <v-list dense style="padding: 0px;">
-              <v-list-item
-                v-for="(telefono,index) in propiedades.item.data.telefonos"
-                :key="`${index}-${telefono.valor}`"
+      <lista-paginacion :config="configLista" :items="contactos">
+        <template slot="datosPersonales" slot-scope="datos">
+          <v-card-text
+            style="padding-top:2px;padding-bottom:2px;padding-left:5px;padding-right:5px;"
+          >
+            <v-row align="start" justify="start" no-gutters style="padding:0px;">
+              <v-col cols="3">Nombre</v-col>
+              <v-col cols="9">
+                <b>{{datos.item.nombreCompleto}}</b>
+              </v-col>
+              <v-col cols="3">Cargo</v-col>
+              <v-col cols="9">
+                <b>{{datos.item.cargo}}</b>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </template>
+        <template slot="telefonos" slot-scope="datos">
+          <v-row align="start" justify="start" no-gutters>
+            <v-col cols="2">
+              <v-icon color="indigo">mdi-phone</v-icon>
+            </v-col>
+            <v-col cols="10">
+              <b>
+                <ul style="list-style:none;padding:0px;">
+                  <li
+                    v-for="(telefono,index) in datos.item.telefonos"
+                    :key="`${index}-${telefono.valor}`"
+                    style="padding-top:2px;padding-bottom:2px;"
+                  >{{telefono.valor}}</li>
+                </ul>
+              </b>
+            </v-col>
+          </v-row>
+        </template>
+        <template slot="correos" slot-scope="datos">
+          <v-row align="start" justify="start" no-gutters>
+            <v-col cols="2">
+              <v-icon color="indigo">email</v-icon>
+            </v-col>
+            <v-col cols="10">
+              <b>
+                <ul style="list-style:none;padding:0px;">
+                  <li
+                    v-for="(correo,index) in datos.item.correos"
+                    :key="`${index}-${correo.valor}`"
+                    style="padding-top:2px;padding-bottom:2px;"
+                  >{{correo.valor}}</li>
+                </ul>
+              </b>
+            </v-col>
+          </v-row>
+        </template>
+        <template slot="acciones" slot-scope="datos">
+          <ul style="list-style:none;padding:0px;">
+            <li>
+              <v-btn
+                class="ma-2"
+                text
+                color="primary"
+                @click="editarContacto(datos.item,datos.indexFila)"
               >
-                <v-list-item-content>
-                  <v-list-item-title>
-                    <v-icon color="indigo">mdi-phone</v-icon>
-                    {{telefono.valor}}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </div>
-          <div v-if="propiedades.item.encabezado.index==2">
-            <v-list dense style="padding: 0px;">
-              <v-list-item
-                v-for="(correo,index) in propiedades.item.data.correos"
-                :key="`${index}-${correo.valor}`"
+                <v-icon left>edit</v-icon>Editar
+              </v-btn>
+            </li>
+            <li>
+              <v-btn
+                class="ma-2"
+                text
+                color="primary"
+                @click="eliminarContacto(datos.item,datos.indexFila)"
               >
-                <v-list-item-content>
-                  <v-list-item-title>
-                    <v-icon color="indigo">mdi-email</v-icon>
-                    {{correo.valor}}
-                  </v-list-item-title>
-                </v-list-item-content>
-              </v-list-item>
-            </v-list>
-          </div>
+                <v-icon left>delete</v-icon>Eliminar
+              </v-btn>
+            </li>
+          </ul>
         </template>
       </lista-paginacion>
     </v-col>
@@ -138,27 +175,54 @@
 <script>
 import InputTextDinamico from "../components/InputTextDinamico";
 import ListaPaginacion from "../components/ListaPaginacion";
+import { store } from "../servicios/store";
 
 export default {
   components: {
     InputTextDinamico,
     ListaPaginacion
   },
+  mounted() {
+    this.contactos = this.storeState.sede.contactos;
+  },
   data() {
     return {
+      storeState: store.state,
       prueba: null,
       agregandoContacto: true,
+      indiceContaco: null,
       textosControles: ["Agregar Contacto", "Editar Contacto"],
       configLista: {
-        titulo: "Lista de contactos",
+        titulo: "Sedes entidad",
+        color: "#fff",
         encabezados: [
-          { texto: "Datos personales", ancho: 5 },
-          { texto: "Telefono(s)", ancho: 2 },
-          { texto: "Fax(es)", ancho: 5 }
+          {
+            nombre: "datosPersonales",
+            texto: "Datos personales",
+            anchos: { xs: 12, sm: 12, md: 4, lg: 4, xl: 4 }
+          },
+          {
+            nombre: "telefonos",
+            texto: "Telefono(s)",
+            anchos: { xs: 12, sm: 12, md: 3, lg: 3, xl: 3 }
+          },
+          {
+            nombre: "correos",
+            texto: "Correo(s)",
+            anchos: { xs: 12, sm: 12, md: 3, lg: 3, xl: 3 }
+          },
+          {
+            nombre: "acciones",
+            texto: "Acciones",
+            anchos: { xs: 12, sm: 12, md: 2, lg: 2, xl: 2 }
+          }
         ],
         itemAvatar: {
           ver: true,
           icono: "person"
+        },
+        itemAccion: {
+          ver: true
         }
       },
       contactoActual: {
@@ -178,21 +242,60 @@ export default {
     guardarContacto() {
       this.$refs.formDatosContacto.validate().then(esValido => {
         if (esValido) {
-          if (this.guardarContacto) {
+          if (this.agregandoContacto) {
             let nombreCompleto = this.crearNombreCompleto();
             this.contactoActual.nombreCompleto = nombreCompleto;
-            this.contactos.push(this.contactoActual);
+            store.agregarContactoSede(this.contactoActual);
+            //this.contactos.push(this.contactoActual);
             this.resetContactoActual();
             this.$refs.formDatosContacto.reset();
           } else {
-            alert("editar");
+            //Seteando los nuevos valores
+            this.contactos[
+              this.indiceContaco
+            ].primerNombre = this.contactoActual.primerNombre;
+            this.contactos[
+              this.indiceContaco
+            ].segundoNombre = this.contactoActual.segundoNombre;
+            this.contactos[
+              this.indiceContaco
+            ].tercerNombre = this.contactoActual.tercerNombre;
+            this.contactos[
+              this.indiceContaco
+            ].primerApellido = this.contactoActual.primerApellido;
+            this.contactos[
+              this.indiceContaco
+            ].segundoApellido = this.contactoActual.segundoApellido;
+            this.contactos[
+              this.indiceContaco
+            ].nombreCompleto = this.crearNombreCompleto();
+            this.contactos[
+              this.indiceContaco
+            ].cargo = this.contactoActual.cargo;
+            this.contactos[
+              this.indiceContaco
+            ].correos = this.contactoActual.correos;
+            this.contactos[
+              this.indiceContaco
+            ].telefonos = this.contactoActual.telefonos;
+
+            //Reseteando los demas campos
+            this.resetContactoActual();
+            this.agregandoContacto = true;
+            this.indiceContaco = null;
+            this.$refs.formDatosContacto.reset();
           }
         }
       });
     },
     limpiarFormnulario() {
       this.resetContactoActual();
+      this.agregandoContacto = true;
       this.$refs.formDatosContacto.reset();
+    },
+    limpiarTodo() {
+      this.limpiarFormnulario();
+      this.contactos = [];
     },
     resetContactoActual() {
       this.contactoActual = {
@@ -209,7 +312,7 @@ export default {
     crearNombreCompleto() {
       return (
         this.contactoActual.primerNombre +
-        (this.contactoActual.segundoNombre = !null
+        (this.contactoActual.segundoNombre != null
           ? " " + this.contactoActual.segundoNombre
           : "") +
         (this.contactoActual.tercerNombre != null
@@ -222,6 +325,23 @@ export default {
           ? " " + this.contactoActual.segundoApellido
           : "")
       );
+    },
+    editarContacto(contacto, indexFila) {
+      this.agregandoContacto = false;
+      this.indiceContaco = indexFila;
+      /*
+      Se tiene que realizar un clon del objeto contenido en un indice del array porque si no se realiza entonces
+      se esta trabajando con un objeto por referencia y no con un objeto por valor, y al momento de editar
+      los cambios se muestran instantaneamente en el array.
+      */
+      let clonObjEnArray = JSON.parse(
+        JSON.stringify(this.contactos[indexFila])
+      );
+      this.contactoActual = clonObjEnArray;
+    },
+    eliminarContacto(contacto, index) {
+      store.eliminarContactoSede(index);
+      //this.contactos.splice(index,1)
     }
   },
   computed: {
@@ -234,6 +354,16 @@ export default {
       return this.agregandoContacto
         ? this.textosControles[0]
         : this.textosControles[1];
+    }
+  },
+  watch: {
+    "storeState.sede"(valor) {
+      this.contactos=this.storeState.sede.contactos;
+      /*
+      this.contactos = JSON.parse(
+        JSON.stringify(this.storeState.sede.contactos)
+      );
+      */
     }
   }
 };
