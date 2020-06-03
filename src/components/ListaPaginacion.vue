@@ -6,21 +6,23 @@
         <template v-if="items.length==0">
           <v-list-item>
             <v-list-item-content>
-              <v-alert type="info">Sin datos que mostrar</v-alert>
+              <v-alert color="grey lighten-3" style="text-align:center;">Sin datos que mostrar</v-alert>
             </v-list-item-content>
           </v-list-item>
         </template>
         <template v-else>
           <v-row justify="center">
-            <v-col
-              v-for="(encabezado,indexEncabezado) in config.encabezados"
-              :key="`titulos-${indexEncabezado}-${encabezado.nombre}`"
-              :xs="encabezado.anchos.xs"
-              :sm="encabezado.anchos.sm"
-              :md="encabezado.anchos.md"
-              :lg="encabezado.anchos.lg"
-              :xl="encabezado.anchos.xl"
-            >{{encabezado.texto}}</v-col>
+            <template v-if="verFilaEncabezados">
+              <v-col
+                v-for="(encabezado,indexEncabezado) in config.encabezados"
+                :key="`titulos-${indexEncabezado}-${encabezado.nombre}`"
+                :xs="encabezado.anchos.xs"
+                :sm="encabezado.anchos.sm"
+                :md="encabezado.anchos.md"
+                :lg="encabezado.anchos.lg"
+                :xl="encabezado.anchos.xl"
+              >{{encabezado.texto}}</v-col>
+            </template>
           </v-row>
           <v-list-item v-for="(item,indexFila) in items" :key="`item-paginacion-${indexFila}`">
             <v-list-item-avatar v-if="config.itemAvatar.ver">
@@ -32,12 +34,13 @@
                 <v-col
                   v-for="(encabezado,indexEncabezado) in config.encabezados"
                   :key="`${indexFila}-${indexEncabezado}-${encabezado.nombre}`"
-                  :xs="encabezado.anchos.xs"
+                  :cols="encabezado.anchos.xs"
                   :sm="encabezado.anchos.sm"
                   :md="encabezado.anchos.md"
                   :lg="encabezado.anchos.lg"
                   :xl="encabezado.anchos.xl"
                 >
+                 <span v-if="!verFilaEncabezados">{{encabezado.texto}}<br></span>
                   <slot :name="encabezado.nombre" v-bind="{item,encabezado,indexFila}"></slot>
                 </v-col>
               </v-row>
@@ -77,6 +80,22 @@ export default {
       type: Array,
       default() {
         return [];
+      }
+    }
+  },
+  computed: {
+    verFilaEncabezados() {
+      switch (this.$vuetify.breakpoint.name) {
+        case "xs":
+          return false;
+        case "sm":
+          return false;
+        case "md":
+          return true;
+        case "lg":
+          return true;
+        case "xl":
+          return true;
       }
     }
   }

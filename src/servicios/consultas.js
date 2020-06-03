@@ -14,6 +14,16 @@ export default class Servicios {
         return response;
     }
 
+    async getPaginacionEntidades(id){
+        var response = await Axios.get('/paginacion-entidades',{
+            params: {
+                id: id,
+                cantidadPorPagina:5
+            }
+        });
+        return response;
+    }
+
     async getReporteEntidad(id) {
         var response = await Axios.get('/reporte-entidad', {
             responseType:'blob',
@@ -29,6 +39,14 @@ export default class Servicios {
             params: {
                 catalogo: catalogo
             }
+        });
+        return response;
+    }
+
+    async login(usuario,password){
+        var response =await Axios.post('/login',{
+            usuario:usuario,
+            password:password
         });
         return response;
     }

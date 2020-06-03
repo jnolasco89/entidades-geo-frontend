@@ -5,14 +5,19 @@
     <v-card-text>
       <div style="position:absolute;top:30px;left:10px;right:10px;height:89%;width:98.5%;">
         <!-- style="height:100%;position:absolute;top:40px;left:10px;right:10px;height:89%;width:98.5%;" -->
-        <v-row align="center" justify="start">
+        <v-row align="center" justify="start" v-if="config.autocomplete.habilitado">
           <v-col cols="6">
-            <v-text-field id="autocomplete" label="Buscar ubicacion en mapa" prepend-icon="place"></v-text-field>
+            <v-text-field id="autocomplete" prepend-icon="place"></v-text-field>
           </v-col>
           <v-col cols="1">
             <v-btn small color="default" @click="resetMapa">
               <v-icon left>clear</v-icon>Limpiar
             </v-btn>
+          </v-col>
+        </v-row>
+        <v-row align="center" justify="start" v-else>
+          <v-col cols="12">
+            <br>
           </v-col>
         </v-row>
         <v-row align="stretch" justify="center" style="height: 95%;">
@@ -63,7 +68,13 @@ export default {
       default() {
         return {
           alto: "900px",
-          eventBus: null
+          eventBus: null,
+          eventoClick: {
+            habilitado: true
+          },
+          autocomplete:{
+            habilitado: true
+          }
         };
       }
     },
@@ -208,15 +219,39 @@ export default {
           this.google = apiGoogle;
           this.map = new this.google.maps.Map(el, config);
 
-          this.map.addListener("rightclick", mapMouseEvent => {
-            this.crearMarcador(
-              mapMouseEvent.latLng.lat(),
-              mapMouseEvent.latLng.lng()
-            );
-          });
+          if (this.config.eventoClick.habilitado) {
+            this.map.addListener("rightclick", mapMouseEvent => {
+              this.crearMarcador(
+                mapMouseEvent.latLng.lat(),
+                mapMouseEvent.latLng.lng()
+              );
+            });
+          }
 
           //Creando autocomplete
-          this.crearAutocomplete();
+          if(this.config.autocomplete.habilitado){
+            this.crearAutocomplete();
+          }
+          
+
+          //Si se manda una coordenada inicial diferernte de null entonces se crea el marcador
+          if (
+            this.coordenadas.latitud != null &&
+            this.coordenadas.longitud != null
+          ) {
+            this.crearMarcador(
+              this.coordenadas.latitud,
+              this.coordenadas.longitud
+            );
+
+            let latLng = new google.maps.LatLng(
+              this.coordenadas.latitud,
+              this.coordenadas.longitud
+            );
+            this.map.setZoom(10);
+            //this.map.panTo(latLng);
+            this.map.setCenter(latLng);
+          }
         })
         .catch(err => {
           console.error(err);

@@ -3,26 +3,43 @@ import Vue from 'vue';
 
 Vue.use(VueRouter);
 
-function cargaLazyVista(vista){
-    return ()=> import(`./vistas/${vista}.vue`);
+function cargaLazyVista(vista) {
+    return () => import(`./vistas/${vista}.vue`);
 }
 
-function cargaLazyComponent(componente){
-    return ()=> import(`./components/${componente}.vue`);
+function cargaLazyComponent(componente) {
+    return () => import(`./components/${componente}.vue`);
 }
 
-export default new VueRouter({
-    routes:[
+
+let router = new VueRouter({
+    routes: [
         {
             path: '/',
-            name: '/',
-            component: cargaLazyVista('Layout')
+            name: 'Login',
+            component: cargaLazyVista('Login')
+        },
+        {
+            path: '/home',
+            name: 'Home',
+            component: cargaLazyVista('Layout'),
+            meta:{
+                requiereAutenticacion:true
+            }
         },
         {
             path: '/directorio-entidades',
-            name: '/',
+            name: 'DirectorioEntidades',
             component: cargaLazyVista('DirectorioEntidades')
         },
     ]
 });
 
+router.beforeEach((to, from, next) => {
+    if(to.matched.some(record=>record.meta.requiereAutenticacion)){
+        console.log("Este component rquiere auto");
+    }
+    next();
+});
+
+export default router;

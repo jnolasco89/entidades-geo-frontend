@@ -1,103 +1,136 @@
 <template>
   <v-app>
-    <v-content>
-      <v-container fluid class="pa-12 grey lighten-4">
-        <v-row justify="center" align="center">
-          <v-col cols="1">
-            <v-img :src="logo" alt="Logo conna" width="80"></v-img>
-          </v-col>
-          <v-col cols="5">
-            <h1>Directorio de entidades inscritas</h1>
-          </v-col>
-        </v-row>
-        <v-row align="center" justify="center">
-          <v-col cols="11">
-            <v-card outlined>
-              <v-card-text>
-                <v-row justify="center" align="center">
-                  <v-col cols="5">
-                    <v-text-field label="Nombre entidad" style="margin-top: 4px;"></v-text-field>
-                  </v-col>
-                  <v-col cols="5">
-                    <v-select
-                      label="Tipologia"
-                      multiple
-                      chips
-                      :items="tipologias"
-                      item-text="nombre"
-                      return-object
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="1">
+    <v-container fluid class="pa-12 grey lighten-4">
+      <v-row justify="center" align="center">
+        <v-col cols="12">
+          <v-img :src="logo" alt="Logo conna" width="100" style="margin:0 auto;"></v-img>
+          <h1 style="text-align:center;">Directorio de entidades inscritas</h1>
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center">
+        <v-col cols="12" lg="11">
+          <v-card outlined>
+            <v-card-text>
+              <v-row justify="center" align="center">
+                <v-col cols="12" lg="6">
+                  <v-text-field label="Nombre entidad" style="margin-top: 4px;"></v-text-field>
+                </v-col>
+                <v-col cols="12" lg="6">
+                  <v-select
+                    label="Tipologia"
+                    multiple
+                    chips
+                    :items="tipologias"
+                    item-text="nombre"
+                    return-object
+                    dense
+                  ></v-select>
+                </v-col>
+                <v-col cols="12">
+                  <div class="text-center">
                     <v-btn color="primary">
                       <v-icon left>search</v-icon>Buscar
                     </v-btn>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-        <v-row align="center" justify="center">
-          <v-col cols="11">
-            <lista-paginacion :config="configListaEntidades" :items="entidades">
-              <template slot="datosGenerales" slot-scope="datos">
-                <v-card outlined color="#fff">
-                  <v-card-text>
-                    <h2 style="color:black;">{{datos.item.nombre}}</h2>
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center" v-show="cargando">
+        <v-col cols="12" lg="11">
+          <template v-for="n in 10">
+            <v-skeleton-loader
+              ref="skeleton"
+              :boilerplate="false"
+              type="article"
+              height="150"
+              :tile="false"
+              class="mx-auto"
+              v-bind:key="`article-${n}`"
+            ></v-skeleton-loader>
+            <hr v-bind:key="`hr-${n}`" />
+          </template>
+        </v-col>
+      </v-row>
+      <v-row align="center" justify="center" v-show="!cargando">
+        <v-col cols="12" lg="11">
+          <lista-paginacion :config="configListaEntidades" :items="entidaeds2">
+            <template slot="datosGenerales" slot-scope="datos">
+              <v-card outlined color="#fff">
+                <v-card-text>
+                  <h2 style="color:black;">{{datos.item.nombre}}</h2>
+                  <!--
                     <h4 style="color:grey;margin-top:10px;">{{datos.item.representanteLegal}}</h4>
                     <h5>Representante legal</h5>
-                  </v-card-text>
-                </v-card>
-              </template>
-              <template slot="tipologia" slot-scope="datos">
-                <v-chip
-                  class="ma-2"
-                  v-for="(tipo,index) in datos.item.tipologia"
-                  :key="`${index}-${tipo.id}`"
-                >{{tipo.nombre}}</v-chip>
-              </template>
-              <template slot="sedes" slot-scope="datos">
-                <v-list disabled>
-                  <v-list-item-group>
-                    <v-list-item
-                      v-for="(sede, index) in datos.item.sedes"
-                      :key="`${index}-${sede.departamento.DepartamentoID}-${sede.municipio.MunicipioID}`"
-                    >
-                      <v-list-item-icon>
-                        <v-icon color="indigo">place</v-icon>
-                      </v-list-item-icon>
-                      <v-list-item-content>
-                        <v-list-item-title>{{sede.municipio.MunicipioLbl}}, {{sede.departamento.DepartamentoLbl}}</v-list-item-title>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list-item-group>
-                </v-list>
-              </template>
-              <template slot="acciones" slot-scope="datos">
-                <ul style="list-style:none;">
-                  <li>
-                    <v-btn
-                      class="ma-2"
-                      text
-                      color="primary"
-                      @click="verDetallesEntidad(datos.item)"
-                    >
-                      <v-icon left>info</v-icon>Detalles
-                    </v-btn>
-                  </li>
-                  <li>
-                    <v-btn class="ma-2" text color="primary" @click="generarReporte(datos.item.id)">
-                      <v-icon left>picture_as_pdf</v-icon>Reporte
-                    </v-btn>
-                  </li>
-                </ul>
-              </template>
-            </lista-paginacion>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-content>
+                  -->
+                </v-card-text>
+              </v-card>
+            </template>
+            <template slot="tipologia" slot-scope="datos">
+              <v-chip
+                class="ma-2"
+                v-for="(tipo,index) in datos.item.tipologia"
+                :key="`${index}-${tipo.id}`"
+              >{{tipo.nombre}}</v-chip>
+            </template>
+            <template slot="sedes" slot-scope="datos">
+              <v-list disabled>
+                <v-list-item-group>
+                  <v-list-item
+                    v-for="(sede, index) in datos.item.sedes"
+                    :key="`${index}-${sede.departamento.DepartamentoID}-${sede.municipio.MunicipioID}`"
+                  >
+                    <v-list-item-icon>
+                      <v-icon color="indigo">place</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                      <v-list-item-title>{{sede.municipio.MunicipioLbl}},&nbsp;{{sede.departamento.DepartamentoLbl}}</v-list-item-title>
+                      <v-list-item-subtitle v-if="sede.tipo.id==1">Central</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+            </template>
+            <template slot="acciones" slot-scope="datos">
+              <v-row>
+                <v-col cols="6" sm="3" md="12">
+                  <v-btn class="ma-2" text color="primary" @click="verDetallesEntidad(datos.item)">
+                    <v-icon left>info</v-icon>Detalles
+                  </v-btn>
+                </v-col>
+                <v-col cols="6" sm="3" md="12">
+                  <v-btn class="ma-2" text color="primary" @click="generarReporte(datos.item.id)">
+                    <v-icon left>picture_as_pdf</v-icon>Reporte
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </template>
+          </lista-paginacion>
+          <v-row justify="center" align="center">
+            <v-col cols="12" v-show="cargarMasEntidades">
+              <v-progress-linear indeterminate color="success" class="mb-0"></v-progress-linear>
+            </v-col>
+            <v-col cols="12">
+              <div class="text-center">
+                <v-alert type="success" v-show="yaNoHayMasDatos">No hay nada más que mostrar</v-alert>
+                <v-btn
+                  text
+                  color="primary"
+                  v-show="!yaNoHayMasDatos"
+                  @click="cargarEntidades"
+                  :disabled="cargarMasEntidades"
+                >
+                  Cargar más entidades&nbsp;
+                  <v-icon>add</v-icon>
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <v-dialog v-model="verModalCargando" persistent width="300">
       <v-card color="success" dark>
@@ -108,7 +141,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="verModal" width="73%" scrollable>
+    <v-dialog v-model="verModal" :width="tamanioModal" scrollable>
       <v-card>
         <v-card-title
           class="headline primary dark"
@@ -116,7 +149,7 @@
           primary-title
         >Detalles entidad</v-card-title>
         <v-divider></v-divider>
-        <v-card-text>
+        <v-card-text id="dialog-detalles-content">
           <v-row>
             <v-col cols="12">
               <v-card outlined>
@@ -128,11 +161,13 @@
                       <br />
                       <p class="label">{{entidadActual.nombre}}</p>
                     </v-col>
+                    <!--
                     <v-col cols="12">
                       <span>Representante legal</span>
                       <br />
                       <p class="label">{{entidadActual.representanteLegal}}</p>
                     </v-col>
+                    -->
                     <v-col cols="12">
                       <span>Tipologia</span>
                       <br />
@@ -149,6 +184,9 @@
             <v-col cols="12">
               <lista-sedes-entidad :sedes="entidadActual.sedes"></lista-sedes-entidad>
             </v-col>
+            <v-col cols="12">
+              <mapa :config="configMapa" :coordenadas="{longitud:-89.838993,latitud:13.929196}"></mapa>
+            </v-col>
           </v-row>
         </v-card-text>
         <v-divider></v-divider>
@@ -158,6 +196,15 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="cargando" persistent width="300">
+      <v-card color="success" dark>
+        <v-card-text>
+          <h4>Cargando...</h4>
+          <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 <script>
@@ -165,13 +212,15 @@ import ListaPaginacion from "../components/ListaPaginacion";
 import ListaSedesEntidad from "../components/ListaSedesEntidad";
 import Consultas from "../servicios/consultas";
 import logoConna from "../assets/logo-conna-transparente.png";
+import Mapa from "../components/Mapa";
 
 const serv = new Consultas();
 
 export default {
   components: {
     ListaPaginacion,
-    ListaSedesEntidad
+    ListaSedesEntidad,
+    Mapa
   },
   mounted() {
     this.cargaInicial();
@@ -181,6 +230,18 @@ export default {
       verModal: false,
       verModalCargando: false,
       logo: logoConna,
+      cargando: true,
+      cargarMasEntidades: false,
+      yaNoHayMasDatos: false,
+      configMapa: {
+        alto: "600px",
+        eventoClick: {
+          habilitado: false
+        },
+        autocomplete: {
+          habilitado: false
+        }
+      },
       entidadActual: {
         nombre: null,
         representanteLegal: null,
@@ -217,580 +278,41 @@ export default {
         }
       },
       tipologias: [],
-      entidades: [
-        {
-          id: 1,
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 2, nombre: "Sensilibizacion" },
-            { id: 3, nombre: "Sensilibizacion" },
-            { id: 4, nombre: "Sensilibizacion" },
-            { id: 5, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                },
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                },
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            },
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            },
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                },
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 2,
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  cargo: "Tecnico III",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          nombre: "Entidad numero 1 s.a de c.v",
-          representanteLegal: "Jose Edgardo Nolasco Rodriguez",
-          tipologia: [
-            { id: 1, nombre: "Participacion" },
-            { id: 4, nombre: "Sensilibizacion" }
-          ],
-          sedes: [
-            {
-              departamento: {
-                DepartamentoLbl: "Ahuachapan",
-                DepartamentoID: 1
-              },
-              municipio: {
-                MunicipioLbl: "Ahuachapan",
-                MunicipioID: 1
-              },
-              direccion: "Colonia Ivu 2a etapa pasaje No 11 Casa No 8",
-              coordenadas: {
-                longitud: null,
-                latitud: null
-              },
-              telefonos: [{ valor: "7696-0081" }, { valor: "7696-0081" }],
-              faxes: [{ valor: "7696-0081" }],
-              correos: [{ valor: "josenolasco@gmail.com" }],
-              contactos: [
-                {
-                  primerNombre: "Jose",
-                  segundoNombre: "Edgardo",
-                  tercerNombre: null,
-                  primerApellido: "Nolasco",
-                  segundoApellido: "Rodriguez",
-                  nombreCompleto: "Jose Edgardo Nolasco ROdriguez",
-                  cargo: "Tecnico III",
-                  correos: [
-                    { valor: "josenolasco@gmail.com" },
-                    { valor: "josenolasco@gmail.com" }
-                  ],
-                  telefonos: [{ valor: "7696-0081" }]
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      entidaeds2: []
     };
   },
   methods: {
+    cargarEntidades() {
+      if (!this.cargarMasEntidades) {
+        this.cargarMasEntidades = true;
+        serv
+          .getPaginacionEntidades(
+            this.entidaeds2[this.entidaeds2.length - 1].id
+          )
+          .then(r => {
+            if (r.data.length > 0) {
+              this.entidaeds2 = [...this.entidaeds2, ...r.data];
+            } else {
+              this.yaNoHayMasDatos = true;
+            }
+
+            this.cargarMasEntidades = false;
+          });
+      }
+    },
     verDetallesEntidad(entidad) {
       this.entidadActual = entidad;
       this.verModal = true;
     },
     cerrarDetallesEntidad() {
       this.verModal = false;
-      this.entidadActual = {
-        nombre: null,
-        representanteLegal: null,
-        tipologia: []
-      };
-      this.entidadActual.sedes = [];
+      //Se usa setTimeout para evitar que se vea subir el scroll cuando se cierra el modal.
+      setTimeout(() => {
+        document.getElementById("dialog-detalles-content").scrollTop = 0;
+      }, 50);
     },
     generarReporte(id) {
+      alert(id);
       this.verModalCargando = true;
       serv.getReporteEntidad(id).then(respuesta => {
         const url = window.URL.createObjectURL(new Blob([respuesta.data]));
@@ -805,8 +327,29 @@ export default {
       let self = this;
       await serv.getCatalogo("tipologias").then(r => {
         self.tipologias = r.data;
-        console.log(self.tipologias);
       });
+
+      await serv.getPaginacionEntidades(1).then(r => {
+        self.entidaeds2 = r.data;
+      });
+
+      this.cargando = false;
+    }
+  },
+  computed: {
+    tamanioModal() {
+      switch (this.$vuetify.breakpoint.name) {
+        case "xs":
+          return '100%';
+        case "sm":
+          return '100%';
+        case "md":
+          return '100%';
+        case "lg":
+          return '75%';
+        case "xl":
+          return '75%';
+      }
     }
   }
 };
