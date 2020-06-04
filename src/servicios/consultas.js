@@ -14,11 +14,21 @@ export default class Servicios {
         return response;
     }
 
-    async getPaginacionEntidades(id){
-        var response = await Axios.get('/paginacion-entidades',{
+    async filtrarEntidades(textoFiltro, tipologias) {
+        var response = await Axios.post('/filtrar-entidades', {
+            textoFiltro: textoFiltro,
+            tipologias: tipologias
+        });
+
+
+        return response;
+    }
+
+    async getPaginacionEntidades(id) {
+        var response = await Axios.get('/paginacion-entidades', {
             params: {
                 id: id,
-                cantidadPorPagina:5
+                cantidadPorPagina: 5
             }
         });
         return response;
@@ -26,7 +36,7 @@ export default class Servicios {
 
     async getReporteEntidad(id) {
         var response = await Axios.get('/reporte-entidad', {
-            responseType:'blob',
+            responseType: 'blob',
             params: {
                 id: id
             }
@@ -34,7 +44,7 @@ export default class Servicios {
         return response;
     }
 
-    async getCatalogo(catalogo){
+    async getCatalogo(catalogo) {
         var response = await Axios.get('/catalogo', {
             params: {
                 catalogo: catalogo
@@ -43,10 +53,10 @@ export default class Servicios {
         return response;
     }
 
-    async login(usuario,password){
-        var response =await Axios.post('/login',{
-            usuario:usuario,
-            password:password
+    async login(usuario, password) {
+        var response = await Axios.post('/login', {
+            usuario: usuario,
+            password: password
         });
         return response;
     }

@@ -1,6 +1,9 @@
 <template>
   <v-card :color="config.color" outlined>
     <v-card-title>{{config.titulo}}</v-card-title>
+    <v-card-subtitle>
+      <slot name="subtitulo"></slot>
+    </v-card-subtitle>
     <v-card-text>
       <v-list>
         <template v-if="items.length==0">
@@ -25,6 +28,7 @@
             </template>
           </v-row>
           <v-list-item v-for="(item,indexFila) in items" :key="`item-paginacion-${indexFila}`">
+            
             <v-list-item-avatar v-if="config.itemAvatar.ver">
               <v-icon color="indigo">{{config.itemAvatar.icono}}</v-icon>
             </v-list-item-avatar>

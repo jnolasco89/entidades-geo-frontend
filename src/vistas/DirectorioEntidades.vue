@@ -13,7 +13,11 @@
             <v-card-text>
               <v-row justify="center" align="center">
                 <v-col cols="12" lg="6">
-                  <v-text-field label="Nombre entidad" style="margin-top: 4px;"></v-text-field>
+                  <v-text-field
+                    label="Nombre entidad"
+                    v-model="textoFiltro"
+                    style="margin-top: 4px;"
+                  ></v-text-field>
                 </v-col>
                 <v-col cols="12" lg="6">
                   <v-select
@@ -22,13 +26,14 @@
                     chips
                     :items="tipologias"
                     item-text="nombre"
+                    v-model="tipologiasFiltro"
                     return-object
                     dense
                   ></v-select>
                 </v-col>
                 <v-col cols="12">
                   <div class="text-center">
-                    <v-btn color="primary">
+                    <v-btn color="primary" @click="filtrarEntidades">
                       <v-icon left>search</v-icon>Buscar
                     </v-btn>
                   </div>
@@ -57,10 +62,21 @@
       <v-row align="center" justify="center" v-show="!cargando">
         <v-col cols="12" lg="11">
           <lista-paginacion :config="configListaEntidades" :items="entidaeds2">
+            <template slot="subtitulo">{{msjSubtituloLista}}</template>
             <template slot="datosGenerales" slot-scope="datos">
               <v-card outlined color="#fff">
                 <v-card-text>
-                  <h2 style="color:black;">{{datos.item.nombre}}</h2>
+                  <v-row justify="space-between">
+                    <v-col cols="3">
+                      <v-avatar color="indigo">
+                        <span class="white--text headline">I</span>
+                      </v-avatar>
+                    </v-col>
+                    <v-col cols="9">
+                      <h2 style="color:black;">{{datos.item.nombre}}</h2>
+                    </v-col>
+                  </v-row>
+
                   <!--
                     <h4 style="color:grey;margin-top:10px;">{{datos.item.representanteLegal}}</h4>
                     <h5>Representante legal</h5>
@@ -229,10 +245,12 @@ export default {
     return {
       verModal: false,
       verModalCargando: false,
+      entidadesFiltradas: false,
       logo: logoConna,
       cargando: true,
       cargarMasEntidades: false,
       yaNoHayMasDatos: false,
+      msjSubtituloLista: "",
       configMapa: {
         alto: "600px",
         eventoClick: {
@@ -278,10 +296,35 @@ export default {
         }
       },
       tipologias: [],
+      tipologiasFiltro: [],
+      textoFiltro: null,
       entidaeds2: []
     };
   },
   methods: {
+    filtrarEntidades() {
+      this.cargando = true;
+      if (
+        this.tipologiasFiltro.length > 0 ||
+        (this.textoFiltro != null ? this.textoFiltro.length > 0 : false)
+      ) {
+        serv
+          .filtrarEntidades(this.textoFiltro, this.tipologiasFiltro)
+          .then(res => {
+            this.entidaeds2 = res.data;
+            this.cargando = false;
+            this.entidadesFiltradas = true;
+            this.msjSubtituloLista = `Se encontraron ${res.data.length} coincidencias para la búsqueda`;
+          });
+      } else {
+        serv.getPaginacionEntidades(1).then(r => {
+          this.entidaeds2 = r.data.documentos;
+          this.msjSubtituloLista = `Mostrando ${this.entidaeds2.length} de ${r.data.totalDocumentos}`;
+          this.entidadesFiltradas = false;
+          this.cargando = false;
+        });
+      }
+    },
     cargarEntidades() {
       if (!this.cargarMasEntidades) {
         this.cargarMasEntidades = true;
@@ -290,8 +333,9 @@ export default {
             this.entidaeds2[this.entidaeds2.length - 1].id
           )
           .then(r => {
-            if (r.data.length > 0) {
-              this.entidaeds2 = [...this.entidaeds2, ...r.data];
+            if (r.data.documentos.length > 0) {
+              this.entidaeds2 = [...this.entidaeds2, ...r.data.documentos];
+              this.msjSubtituloLista = `Mostrando ${this.entidaeds2.length} de ${r.data.totalDocumentos}`;
             } else {
               this.yaNoHayMasDatos = true;
             }
@@ -330,7 +374,8 @@ export default {
       });
 
       await serv.getPaginacionEntidades(1).then(r => {
-        self.entidaeds2 = r.data;
+        self.entidaeds2 = r.data.documentos;
+        this.msjSubtituloLista = `Mostrando ${this.entidaeds2.length} de ${r.data.totalDocumentos}`;
       });
 
       this.cargando = false;
@@ -340,15 +385,15 @@ export default {
     tamanioModal() {
       switch (this.$vuetify.breakpoint.name) {
         case "xs":
-          return '100%';
+          return "100%";
         case "sm":
-          return '100%';
+          return "100%";
         case "md":
-          return '100%';
+          return "100%";
         case "lg":
-          return '75%';
+          return "75%";
         case "xl":
-          return '75%';
+          return "75%";
       }
     }
   }
