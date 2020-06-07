@@ -83,7 +83,6 @@ export default {
           serv
             .login(this.usuario, this.password)
             .then(respuesta => {
-              alert("COrrio");
               this.$router.replace({ name: "Home" });
             })
             .catch(error => {

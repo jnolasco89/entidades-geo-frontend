@@ -20,7 +20,11 @@ export const store = {
             faxes: [{ valor: null }],
             correos: [{ valor: null }],
             contactos: []
-        }
+        },
+        cargando:false
+    },
+    setCargando(valor){
+        this.state.cargando=valor;
     },
     setEjecutarValidacion(valor) {
         this.state.ejecutarValidacion = valor;

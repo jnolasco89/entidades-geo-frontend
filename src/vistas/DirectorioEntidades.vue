@@ -36,6 +36,9 @@
                     <v-btn color="primary" @click="filtrarEntidades">
                       <v-icon left>search</v-icon>Buscar
                     </v-btn>
+                    <v-btn color="primary" @click="mostrarTodo">
+                      <v-icon left>list</v-icon>Mostrar todo
+                    </v-btn>
                   </div>
                 </v-col>
               </v-row>
@@ -85,11 +88,13 @@
               </v-card>
             </template>
             <template slot="tipologia" slot-scope="datos">
-              <v-chip
-                class="ma-2"
-                v-for="(tipo,index) in datos.item.tipologia"
-                :key="`${index}-${tipo.id}`"
-              >{{tipo.nombre}}</v-chip>
+              <v-chip-group column active-class="primary--text">
+                <v-chip
+                  class="ma-2"
+                  v-for="(tipo,index) in datos.item.tipologia"
+                  :key="`${index}-${tipo.id}`"
+                >{{tipo.nombre}}</v-chip>
+              </v-chip-group>
             </template>
             <template slot="sedes" slot-scope="datos">
               <v-list disabled>
@@ -129,7 +134,7 @@
               <v-progress-linear indeterminate color="success" class="mb-0"></v-progress-linear>
             </v-col>
             <v-col cols="12">
-              <div class="text-center">
+              <div class="text-center" v-show="!entidadesFiltradas">
                 <v-alert type="success" v-show="yaNoHayMasDatos">No hay nada más que mostrar</v-alert>
                 <v-btn
                   text
@@ -227,7 +232,7 @@
 import ListaPaginacion from "../components/ListaPaginacion";
 import ListaSedesEntidad from "../components/ListaSedesEntidad";
 import Consultas from "../servicios/consultas";
-import logoConna from "../assets/logo-conna-transparente.png";
+import logoConna from "../assets/logo-conna-transparente-sin-texto.png";
 import Mapa from "../components/Mapa";
 
 const serv = new Consultas();
@@ -302,6 +307,15 @@ export default {
     };
   },
   methods: {
+    mostrarTodo() {
+      this.cargando = true;
+      serv.getPaginacionEntidades(1).then(r => {
+        this.entidaeds2 = r.data.documentos;
+        this.msjSubtituloLista = `Mostrando ${this.entidaeds2.length} de ${r.data.totalDocumentos}`;
+        this.entidadesFiltradas = false;
+        this.cargando = false;
+      });
+    },
     filtrarEntidades() {
       this.cargando = true;
       if (
@@ -356,7 +370,6 @@ export default {
       }, 50);
     },
     generarReporte(id) {
-      alert(id);
       this.verModalCargando = true;
       serv.getReporteEntidad(id).then(respuesta => {
         const url = window.URL.createObjectURL(new Blob([respuesta.data]));

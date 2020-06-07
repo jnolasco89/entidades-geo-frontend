@@ -20,6 +20,11 @@ let router = new VueRouter({
             component: cargaLazyVista('Login')
         },
         {
+            path: '/votacion',
+            name: 'Votacion',
+            component: cargaLazyVista('PaginaDeVotacion')
+        },
+        {
             path: '/home',
             name: 'Home',
             component: cargaLazyVista('Layout'),
