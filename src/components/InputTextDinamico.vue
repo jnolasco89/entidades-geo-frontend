@@ -2,16 +2,35 @@
   <ul style="list-style: none;padding:0px;">
     <li v-for="(input, index) in listaInputs" v-bind:key="index">
       <ValidationProvider v-slot="{ errors }" :name="`${nombreCampo}-${index+1}`" :rules="reglas">
-      <v-text-field v-if="mascara==null" :prepend-inner-icon="prependIcon" :label="label" v-model="input.valor" :error-messages="errors">
-        <template v-slot:append-outer v-if="index>0">
-          <v-icon @click="eliminarInput(index)">clear</v-icon>
+        <template v-if="mascara==null">
+          <v-text-field
+            :prepend-inner-icon="prependIcon"
+            :label="`${label} ${index+1}`"
+            v-model="input.valor"
+            :error-messages="errors"
+          >
+            <template v-slot:append-outer v-if="index>0">
+              <v-icon @click="eliminarInput(index)">clear</v-icon>
+            </template>
+          </v-text-field>
+          <slot name="extra" v-bind="{index,input}">
+          </slot>
         </template>
-      </v-text-field>
-      <v-text-field v-else-if="mascara!=null" :prepend-inner-icon="prependIcon" :label="label" v-model="input.valor" :error-messages="errors" v-mask="mascara">
-        <template v-slot:append-outer v-if="index>0">
-          <v-icon @click="eliminarInput(index)">clear</v-icon>
+        <template v-else-if="mascara!=null">
+          <v-text-field
+            :prepend-inner-icon="prependIcon"
+            :label="`${label} ${index+1}`"
+            v-model="input.valor"
+            :error-messages="errors"
+            v-mask="mascara"
+          >
+            <template v-slot:append-outer v-if="index>0">
+              <v-icon @click="eliminarInput(index)">clear</v-icon>
+            </template>
+          </v-text-field>
+          <slot name="extra" v-bind="{index}">
+          </slot>
         </template>
-      </v-text-field>
       </ValidationProvider>
       <v-btn
         text
@@ -26,8 +45,8 @@
 <script>
 export default {
   name: "InputTextDinamico",
-  mounted(){
-    this.$emit('update:lista', this.listaInputs);
+  mounted() {
+    this.$emit("update:lista", this.listaInputs);
   },
   props: {
     prependIcon: {
@@ -48,28 +67,28 @@ export default {
         return "Agregar";
       }
     },
-    nombreCampo:{
+    nombreCampo: {
       type: String,
       default() {
         return "Input";
       }
     },
-    reglas:{
+    reglas: {
       type: Object,
       default() {
         return null;
       }
     },
-    mascara:{
-      type:String,
-      default(){
+    mascara: {
+      type: String,
+      default() {
         return null;
       }
     },
-    inputs:{
-      type:Array,
-      default(){
-        return [{valor:null}]
+    inputs: {
+      type: Array,
+      default() {
+        return [{ valor: null }];
       }
     }
   },
@@ -86,14 +105,14 @@ export default {
       this.listaInputs.push({ valor: null });
     }
   },
-  computed:{
-    listaInputs(){
+  computed: {
+    listaInputs() {
       return this.inputs;
     }
   },
   watch: {
     listaInputs(valor) {
-       this.$emit('update:lista', valor);
+      this.$emit("update:lista", valor);
     }
   }
 };
