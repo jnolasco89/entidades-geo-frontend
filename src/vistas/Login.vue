@@ -83,9 +83,12 @@ export default {
           serv
             .login(this.usuario, this.password)
             .then(respuesta => {
-              this.$router.replace({ name: "Home" });
+              localStorage.setItem('usuario',JSON.stringify(respuesta.data.usuario));
+              localStorage.setItem('t',respuesta.data.token);
+              this.$router.replace({ name: "Home"});
             })
             .catch(error => {
+              console.log(error);
               if (error.response == undefined || error.response == null) {
                 this.verError = true;
                 this.msjError = "No se puede conectar con el servidor";

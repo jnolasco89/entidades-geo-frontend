@@ -11,20 +11,12 @@
         />
       </div>
       <v-list dense>
-        <v-list-item link>
+        <v-list-item link v-for="(modulo,index) in modulos" v-bind:key="`modulo-${index}`" @click="cargarModulo(modulo)">
           <v-list-item-action>
-            <v-icon>supervisor_account</v-icon>
+            <v-icon>{{modulo.icono}}</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Usuarios</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-        <v-list-item link>
-          <v-list-item-action>
-            <v-icon>assignment_turned_in</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title>Registro entidades</v-list-item-title>
+            <v-list-item-title>{{modulo.nombreModulo}}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -47,7 +39,8 @@
       <v-container fluid class="pa-12 grey lighten-4" fill-height>
         <v-row align="center" justify="center">
           <v-col cols="12">
-            <admin-votaciones></admin-votaciones>
+            <!--<admin-votaciones></admin-votaciones>-->
+            <router-view></router-view>
           </v-col>
         </v-row>
         <!--
@@ -81,29 +74,43 @@
   </v-app>
 </template>
 <script>
+/*
 import DatosEntidad from "../components/DatosEntidad";
 import AdminSedes from "../components/AdministradorSedes";
 import AdminUsuarios from "../components/AdministradorUsuarios";
-import AdminVotaciones from "../components/AdministradorVotaciones";
+*/
 import logoConna from "../assets/logo-conna-transparente-sin-texto.png";
 import { store } from "../servicios/store";
 
 export default {
   name: "Layout",
   components: {
+    /*
     DatosEntidad,
     AdminSedes,
-    AdminUsuarios,
-    AdminVotaciones
+    AdminUsuarios
+    */
+  },
+  mounted() {
+    let dataUsuario = JSON.parse(localStorage.getItem("usuario"));
+    this.nombreUsuario = dataUsuario.nombreCorto;
+    this.modulos=dataUsuario.accesos;
+    this.$router.push({name:dataUsuario.accesos[0].ruta});
   },
   data() {
     return {
       tabs: null,
       logoConna: logoConna,
-      nombreUsuario: "Nombre Usuario",
+      nombreUsuario: null,
       verModalCargando: store.state.cargando,
-      storeState: store.state
+      storeState: store.state,
+      modulos: []
     };
+  },
+  methods:{
+    cargarModulo(modulo){
+      this.$router.push({ name: modulo.ruta});
+    }
   },
   watch: {
     "storeState.cargando"(valor) {

@@ -23,12 +23,12 @@
             </div>
           </v-col>
           <v-col cols="8">
-            <v-card outlined>
+            <v-card outlined min-height="530">
               <v-card-title class="justify-center">Candidatos</v-card-title>
               <v-card-text>
                 <v-row justify="space-around">
                   <v-col
-                    v-for="opcion in papeletaActual.opcionesVotacion"
+                    v-for="opcion in papeletaActual.opciones"
                     :key="opcion.id"
                     cols="auto"
                   >
@@ -40,14 +40,14 @@
                       style="margin:0px auto;position:relative;"
                       @click="seleccionarContendiente(opcion)"
                     >
-                      <v-img :src="opcion.foto" width="100%" height="100%"></v-img>
+                      <v-img :src="`http://localhost:8082/descargar/${opcion.nombreFoto}`" width="100%" height="100%"></v-img>
                       <v-img
                         id="img-equis"
                         :src="equis"
                         width="100%"
                         height="100%"
                         style="position: absolute;top: 0px;"
-                        v-if="verEquis && opcion.id==opcionSelecionada.id"
+                        v-if="verEquis && opcion.valor==opcionSelecionada.valor"
                       ></v-img>
                     </v-card>
                   </v-col>
@@ -56,9 +56,9 @@
             </v-card>
           </v-col>
           <v-col cols="4">
-            <v-card outlined>
+            <v-card outlined max-height="530" min-height="530" style="overflow-y:auto;">
               <v-card-title class="justify-center">{{tituloWiki}}</v-card-title>
-              <v-card-text>
+              <v-card-text >
                 <div v-show="verEquis">
                   <h3>{{opcionSelecionada.wiki.titulo}}</h3>
                   <p>{{opcionSelecionada.wiki.descripcion}}</p>
@@ -181,8 +181,17 @@
 <script>
 import foto from "../assets/logo-conna-transparente.png";
 import equisVoto from "../assets/equisVoto.png";
+import Servicios from "../servicios/consultas";
+
+const serv=new Servicios();
 
 export default {
+  mounted(){
+    serv.getVotacion('Z7qTArO4AZNocboJ4KM5').then(r=>{
+      let votacion=r.data;
+      this.papeletaActual=votacion.papeletas[0];
+    });
+  },
   beforeMount() {
     this.papeletaActual = this.papeletas[0];
   },
@@ -199,7 +208,7 @@ export default {
           opcionesVotacion: [
             {
               id: 1,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -209,7 +218,7 @@ export default {
             },
             {
               id: 2,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -219,7 +228,7 @@ export default {
             },
             {
               id: 3,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -229,7 +238,7 @@ export default {
             },
             {
               id: 4,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -239,7 +248,7 @@ export default {
             },
             {
               id: 5,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -258,7 +267,7 @@ export default {
           opcionesVotacion: [
             {
               id: 1,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -268,7 +277,7 @@ export default {
             },
             {
               id: 2,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -278,7 +287,7 @@ export default {
             },
             {
               id: 3,
-              nombre: "Ing. José Edgardo Edgardo Nolasco Rordriguez",
+              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
               foto: foto,
               wiki: {
                 titulo: "Titulo wiki",
@@ -311,8 +320,8 @@ export default {
     },
     votar() {
       if (
-        this.opcionSelecionada.id != undefined
-          ? this.opcionSelecionada.id > 0
+        this.opcionSelecionada.valor != undefined
+          ? this.opcionSelecionada.valor > 0
           : false
       ) {
         this.dialogConfirmarVoto = true;

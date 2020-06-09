@@ -24,6 +24,8 @@ export const store = {
         cargando:false
     },
     setCargando(valor){
+        alert("llega a cargando");
+        alert(valor);
         this.state.cargando=valor;
     },
     setEjecutarValidacion(valor) {

@@ -1,5 +1,8 @@
 import VueRouter from 'vue-router';
 import Vue from 'vue';
+import Servicios from './servicios/consultas';
+
+const serv = new Servicios();
 
 Vue.use(VueRouter);
 
@@ -21,16 +24,24 @@ let router = new VueRouter({
         },
         {
             path: '/votacion',
-            name: 'Votacion',
+            name: 'HojaVotacion',
             component: cargaLazyVista('PaginaDeVotacion')
         },
+
         {
             path: '/home',
             name: 'Home',
             component: cargaLazyVista('Layout'),
-            meta:{
-                requiereAutenticacion:true
-            }
+            meta: {
+                requiereAutenticacion: true
+            },
+            children: [
+                {
+                    path: '/admin-votaciones',
+                    name: 'AdminVotaciones',
+                    component: cargaLazyComponent('AdministradorVotaciones')
+                }
+            ]
         },
         {
             path: '/directorio-entidades',
@@ -41,10 +52,22 @@ let router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    if(to.matched.some(record=>record.meta.requiereAutenticacion)){
-        console.log("Este component rquiere auto");
+    if (to.matched.some(record => record.meta.requiereAutenticacion)) {
+        let t = localStorage.getItem('t');
+        if (t != undefined ? t != null : false) {
+            serv.validarToken(localStorage.getItem('t')).then(respuesta => {
+                if (respuesta.data.estado) {
+                    next();
+                } else {
+                    router.push({ name: 'Login' });
+                }
+            });
+        } else {
+            router.push({ name: 'Login' });
+        }
+    } else {
+        next();
     }
-    next();
 });
 
 export default router;

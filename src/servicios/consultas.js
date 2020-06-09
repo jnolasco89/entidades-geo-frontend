@@ -9,6 +9,20 @@ export default class Servicios {
         return response;
     }
 
+    async validarToken(token) {
+        var response = await Axios.post('/validar-token',{}, {
+            headers: {
+                'Authorization': token
+            }
+        });
+        return response;
+    }
+
+    async getVotacion(id){
+        let response=await Axios.get('/votacion/'+id);
+        return response;
+    }
+
     async getAllEntidades() {
         var response = await Axios.get('/entidades');
         return response;
@@ -59,6 +73,26 @@ export default class Servicios {
             password: password
         });
         return response;
+    }
+
+    async agregarVotacion(votacion) {
+        let fecha = new Date();
+        let randdom = Math.floor(Math.random() * (10000 - 1)) + 1;
+        let formData = new FormData();
+
+        votacion.papeletas.forEach(papeleta => {
+            papeleta.opciones.forEach(opcion => {
+                let nombreFoto = `vot-${fecha.getTime()}-${randdom}-${opcion.foto.name}`;
+                formData.append('imagenes', opcion.foto, nombreFoto);
+                //opcion.foto = null;
+                opcion.nombreFoto = nombreFoto;
+            });
+        });
+        formData.append('datos', JSON.stringify(votacion));
+
+        var respuesta = await Axios.post('/votacion', formData, {
+            config: { headers: { 'Content-Type': 'multipart/form-data' } }
+        });
     }
 
     test() {

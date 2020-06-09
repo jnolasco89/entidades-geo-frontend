@@ -260,7 +260,10 @@
 </template>
 <script>
 import InputTextDinamico from "./InputTextDinamico";
+import Servicios from "../servicios/consultas";
 import { extend } from "vee-validate";
+
+const serv = new Servicios();
 
 export default {
   mounted() {
@@ -420,6 +423,14 @@ export default {
       return true;
     },
     guardarVotacion() {
+      
+      let votacion = {
+        nombre: this.nombreVotacion,
+        fechaVencimiento: this.fechaVencimientoFormateada,
+        horaVencimiento: this.horaVencimiento,
+        papeletas: this.papeletas
+      };
+      
       let papeletasValidas = this.validarPapeletas();
       this.validarFormVotacion().then(formVotacionValido => {
         if (formVotacionValido && papeletasValidas) {
@@ -429,10 +440,14 @@ export default {
             horaVencimiento: this.horaVencimiento,
             papeletas: this.papeletas
           };
-
           console.log(JSON.stringify(votación));
+          serv.agregarVotacion(votación).then(r=>{
+            console.log(JSON.stringify(r));
+          });
+          
         }
       });
+      
     }
   }
 };
