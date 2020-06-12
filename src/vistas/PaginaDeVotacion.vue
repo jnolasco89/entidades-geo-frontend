@@ -1,12 +1,44 @@
 <template>
   <v-app>
+    <v-content>
+      <v-container fluid class="pa-4 red lighten-4" fill-height>
+        <v-row style="border:solid 1px red;" class="fill-height">
+          <v-col cols="12">
+            <v-row style="border:solid 1px red;">
+              <v-col cols="2">
+                <v-btn text color="primary" @click="siguientePapeleta">
+                  Siguiente papeleta
+                  <v-icon right>keyboard_arrow_right</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col cols="9">
+                <h1>TITULO</h1>
+              </v-col>
+              <v-col cols="2">
+                <v-btn text color="primary" @click="siguientePapeleta">
+                  Siguiente papeleta
+                  <v-icon right>keyboard_arrow_right</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-row style="border:solid 1px red;">
+              <v-col cols="12">
+                <h1>TITULO</h1>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-content>
+    <!--
     <v-app-bar absolute color="#f5f5f5" elevation="0">
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
-      <v-toolbar-title>
-        <h1 style="text-align:center;">{{papeletaActual.titulo}}</h1>
+      <v-btn text color="primary" @click="siguientePapeleta">
+        Siguiente papeleta
+        <v-icon right>keyboard_arrow_right</v-icon>
+      </v-btn>
+      <v-toolbar-title style="border:solid 1px green;">
+        <h1 style="text-align:center;border:solid 1px red;">{{papeletaActual.titulo}}</h1>
       </v-toolbar-title>
-      <v-spacer></v-spacer>
       <v-btn text color="primary" @click="siguientePapeleta">
         Siguiente papeleta
         <v-icon right>keyboard_arrow_right</v-icon>
@@ -17,7 +49,7 @@
         <v-row>
           <v-col cols="12">
             <div class="text-center" style="padding-top:20px;">
-              <v-btn color="primary" @click="votar">
+              <v-btn color="primary" @click="votar" rounded elevation="24" large>
                 <v-icon left>done</v-icon>Votar
               </v-btn>
             </div>
@@ -27,11 +59,7 @@
               <v-card-title class="justify-center">Candidatos</v-card-title>
               <v-card-text>
                 <v-row justify="space-around">
-                  <v-col
-                    v-for="opcion in papeletaActual.opciones"
-                    :key="opcion.id"
-                    cols="auto"
-                  >
+                  <v-col v-for="opcion in papeletaActual.opciones" :key="opcion.id" cols="auto">
                     <h4 class="text-center">{{opcion.nombre}}</h4>
                     <v-card
                       :elevation="3"
@@ -40,7 +68,11 @@
                       style="margin:0px auto;position:relative;"
                       @click="seleccionarContendiente(opcion)"
                     >
-                      <v-img :src="`http://localhost:8082/descargar/${opcion.nombreFoto}`" width="100%" height="100%"></v-img>
+                      <v-img
+                        :src="`http://localhost:8082/descargar/${opcion.nombreFoto}`"
+                        width="100%"
+                        height="100%"
+                      ></v-img>
                       <v-img
                         id="img-equis"
                         :src="equis"
@@ -58,10 +90,10 @@
           <v-col cols="4">
             <v-card outlined max-height="530" min-height="530" style="overflow-y:auto;">
               <v-card-title class="justify-center">{{tituloWiki}}</v-card-title>
-              <v-card-text >
+              <v-card-text>
                 <div v-show="verEquis">
                   <h3>{{opcionSelecionada.wiki.titulo}}</h3>
-                  <p>{{opcionSelecionada.wiki.descripcion}}</p>
+                  <div v-html="`${opcionSelecionada.wiki.descripcion}`"></div>
                 </div>
                 <div v-show="!verEquis">
                   <p>Esta es una papeleta de votación donde se muestran las diferentes propuestas de elección.</p>
@@ -127,7 +159,7 @@
                       <v-row>
                         <v-col cols="12">
                           <v-img
-                            :src="papeletaActual.opcionSeleccionada.foto"
+                            :src="`http://localhost:8082/descargar/${papeletaActual.opcionSeleccionada.foto}`"
                             style="margin: 0px auto;"
                             width="200"
                             height="250"
@@ -176,6 +208,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    -->
   </v-app>
 </template>
 <script>
@@ -183,13 +216,15 @@ import foto from "../assets/logo-conna-transparente.png";
 import equisVoto from "../assets/equisVoto.png";
 import Servicios from "../servicios/consultas";
 
-const serv=new Servicios();
+const serv = new Servicios();
 
 export default {
-  mounted(){
-    serv.getVotacion('Z7qTArO4AZNocboJ4KM5').then(r=>{
-      let votacion=r.data;
-      this.papeletaActual=votacion.papeletas[0];
+  mounted() {
+    let usuario = JSON.parse(localStorage.getItem("usuario"));
+    serv.getVotacion(usuario.votacion).then(r => {
+      let votacion = r.data;
+      this.papeletas = votacion.papeletas;
+      this.papeletaActual = votacion.papeletas[0];
     });
   },
   beforeMount() {
@@ -198,106 +233,7 @@ export default {
   data() {
     return {
       indexPapeletaActual: 0,
-      papeletas: [
-        {
-          id: 1,
-          titulo: "Elección de Alcaldes periodo 2020 - 2022",
-          marcada: false,
-          opcionSeleccionada: null,
-          opcionMarcada: null,
-          opcionesVotacion: [
-            {
-              id: 1,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            },
-            {
-              id: 2,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            },
-            {
-              id: 3,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            },
-            {
-              id: 4,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            },
-            {
-              id: 5,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            }
-          ]
-        },
-        {
-          id: 1,
-          titulo: "Elección de Alcaldes periodo 2020 - 2022",
-          marcada: false,
-          opcionSeleccionada: null,
-          opcionMarcada: null,
-          opcionesVotacion: [
-            {
-              id: 1,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            },
-            {
-              id: 2,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            },
-            {
-              id: 3,
-              nombre: "José Edgardo Edgardo Nolasco Rordriguez",
-              foto: foto,
-              wiki: {
-                titulo: "Titulo wiki",
-                descripcion:
-                  "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas Letraset, las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."
-              }
-            }
-          ]
-        }
-      ],
+      papeletas: [],
       papeletaActual: null,
       equis: equisVoto,
       verEquis: false,
@@ -332,15 +268,14 @@ export default {
     siguientePapeleta() {
       this.indexPapeletaActual++;
       this.papeletaActual = this.papeletas[this.indexPapeletaActual];
-      this.opcionSelecionada ={
+      this.opcionSelecionada = {
         wiki: {
           titulo: null,
           descripcion: null
         }
       };
-      this.verEquis= false;
-      this.tituloWiki= "Indicaciones";
-
+      this.verEquis = false;
+      this.tituloWiki = "Indicaciones";
     },
     enviarVoto() {
       this.dialogConfirmarVoto = false;
@@ -348,6 +283,8 @@ export default {
       this.papeletas[
         this.indexPapeletaActual
       ].opcionSeleccionada = this.opcionSelecionada;
+      this.papeletaActual = this.papeletas[this.indexPapeletaActual];
+      this.papeletaActual.opcionSeleccionada = this.opcionSelecionada;
     }
   }
 };

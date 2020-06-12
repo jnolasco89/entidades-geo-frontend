@@ -30,7 +30,7 @@
         &nbsp;
         {{nombreUsuario}}
       </v-btn>
-      <v-btn icon>
+      <v-btn icon @click="cerrarSesion">
         <v-icon>power_settings_new</v-icon>
       </v-btn>
     </v-app-bar>
@@ -81,6 +81,9 @@ import AdminUsuarios from "../components/AdministradorUsuarios";
 */
 import logoConna from "../assets/logo-conna-transparente-sin-texto.png";
 import { store } from "../servicios/store";
+import Servicios from "../servicios/consultas";
+
+const serv=new Servicios();
 
 export default {
   name: "Layout",
@@ -110,6 +113,14 @@ export default {
   methods:{
     cargarModulo(modulo){
       this.$router.push({ name: modulo.ruta});
+    },
+    cerrarSesion(){
+      let t=localStorage.getItem('t');
+      serv.cerrarSesion(t).then(()=>{
+        localStorage.removeItem('t');
+        localStorage.removeItem('usuario');
+        this.$router.replace({name:'Login'});
+      });
     }
   },
   watch: {

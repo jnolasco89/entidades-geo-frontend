@@ -16,6 +16,7 @@
                       <v-text-field
                         label="Usuario"
                         name="usuario"
+                        ref="txtUsuario"
                         prepend-icon="person"
                         type="text"
                         v-model="usuario"
@@ -66,6 +67,9 @@ import Consultas from "../servicios/consultas";
 const serv = new Consultas();
 
 export default {
+  mounted(){
+    this.$refs.txtUsuario.$el.focus();
+  },
   data() {
     return {
       usuario: null,
@@ -77,15 +81,22 @@ export default {
   },
   methods: {
     login() {
+      
       this.$refs.formLogin.validate().then(esValido => {
         if (esValido) {
+          let votacion=this.$route.params.votacion;
           this.cargando = true;
           serv
-            .login(this.usuario, this.password)
+            .login(this.usuario, this.password, votacion)
             .then(respuesta => {
               localStorage.setItem('usuario',JSON.stringify(respuesta.data.usuario));
               localStorage.setItem('t',respuesta.data.token);
-              this.$router.replace({ name: "Home"});
+              if(votacion!=undefined){
+                this.$router.replace({ name: "HojaVotacion"});  
+              }else{
+                this.$router.replace({ name: "Home"});  
+              }
+              
             })
             .catch(error => {
               console.log(error);

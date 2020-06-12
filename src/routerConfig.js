@@ -23,9 +23,17 @@ let router = new VueRouter({
             component: cargaLazyVista('Login')
         },
         {
+            path: '/login/:votacion',
+            name: 'LoginVotacion',
+            component: cargaLazyVista('Login')
+        },
+        {
             path: '/votacion',
             name: 'HojaVotacion',
-            component: cargaLazyVista('PaginaDeVotacion')
+            component: cargaLazyVista('PaginaDeVotacion'),
+            meta: {
+                requiereAutenticacion: true
+            }
         },
 
         {
@@ -54,12 +62,20 @@ let router = new VueRouter({
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiereAutenticacion)) {
         let t = localStorage.getItem('t');
-        if (t != undefined ? t != null : false) {
-            serv.validarToken(localStorage.getItem('t')).then(respuesta => {
-                if (respuesta.data.estado) {
+        if (t != undefined ? t != null : true) {
+            serv.validarToken(t).then(respuesta=>{
+                if(respuesta.data.estado){
                     next();
-                } else {
+                }else{
                     router.push({ name: 'Login' });
+                }
+            }).catch(err=>{
+                if(err.response!=undefined){
+                    switch(err.response.status){
+                        case 401:
+                            router.push({ name: 'Login' });
+                        break;
+                    }
                 }
             });
         } else {

@@ -10,7 +10,7 @@ export default class Servicios {
     }
 
     async validarToken(token) {
-        var response = await Axios.post('/validar-token',{}, {
+        let response = await Axios.post('/validar-token', {}, {
             headers: {
                 'Authorization': token
             }
@@ -18,8 +18,17 @@ export default class Servicios {
         return response;
     }
 
-    async getVotacion(id){
-        let response=await Axios.get('/votacion/'+id);
+    async cerrarSesion(token) {
+        let response = await Axios.post('/cerrar-sesion', {}, {
+            headers: {
+                'Authorization': token
+            }
+        });
+        return response;
+    }
+
+    async getVotacion(id) {
+        let response = await Axios.get('/votacion/' + id);
         return response;
     }
 
@@ -67,10 +76,11 @@ export default class Servicios {
         return response;
     }
 
-    async login(usuario, password) {
+    async login(usuario, password, votacion) {
         var response = await Axios.post('/login', {
             usuario: usuario,
-            password: password
+            password: password,
+            votacion: votacion
         });
         return response;
     }
@@ -82,10 +92,11 @@ export default class Servicios {
 
         votacion.papeletas.forEach(papeleta => {
             papeleta.opciones.forEach(opcion => {
-                let nombreFoto = `vot-${fecha.getTime()}-${randdom}-${opcion.foto.name}`;
-                formData.append('imagenes', opcion.foto, nombreFoto);
-                //opcion.foto = null;
-                opcion.nombreFoto = nombreFoto;
+                if (opcion.foto != null) {
+                    let nombreFoto = `vot-${fecha.getTime()}-${randdom}-${opcion.foto.name}`;
+                    formData.append('imagenes', opcion.foto, nombreFoto);
+                    opcion.nombreFoto = nombreFoto;
+                }
             });
         });
         formData.append('datos', JSON.stringify(votacion));
