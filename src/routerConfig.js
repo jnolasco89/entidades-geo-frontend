@@ -63,18 +63,32 @@ router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiereAutenticacion)) {
         let t = localStorage.getItem('t');
         if (t != undefined ? t != null : true) {
-            serv.validarToken(t).then(respuesta=>{
-                if(respuesta.data.estado){
+            let tipo = 1;
+            if (to.name == 'HojaVotacion') {
+                tipo = 2;
+            }
+
+            serv.validarToken(t, { tipo: tipo }).then(respuesta => {
+                if (respuesta.data.estado) {
                     next();
-                }else{
-                    router.push({ name: 'Login' });
+                } else {
+                    alert(tipo);
+                    switch (tipo) {
+                        case 1:
+                            router.push({ name: 'Login' });
+                            break;
+                        case 2:
+                            router.push({ name: 'LoginVotacion',params:{votacion:'AQUIDEBEIRELIDDELAVOTACION'} });
+                            break;
+                    }
+
                 }
-            }).catch(err=>{
-                if(err.response!=undefined){
-                    switch(err.response.status){
+            }).catch(err => {
+                if (err.response != undefined) {
+                    switch (err.response.status) {
                         case 401:
                             router.push({ name: 'Login' });
-                        break;
+                            break;
                     }
                 }
             });

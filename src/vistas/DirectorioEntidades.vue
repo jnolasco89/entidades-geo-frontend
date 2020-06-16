@@ -314,6 +314,8 @@ export default {
         this.msjSubtituloLista = `Mostrando ${this.entidaeds2.length} de ${r.data.totalDocumentos}`;
         this.entidadesFiltradas = false;
         this.cargando = false;
+        this.tipologiasFiltro=[];
+        this.textoFiltro=null;
       });
     },
     filtrarEntidades() {

@@ -759,7 +759,7 @@ export default {
           serv.agregarVotacion(votación).then(r => {
             this.msjAlertSuccess = `Se agregó la votación: "${this.nombreVotacion}"`;
             this.verAlertSuccess = true;
-            this.limpiarFormulario();
+            //this.limpiarFormulario();
           });
         }
       });
