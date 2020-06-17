@@ -27,8 +27,8 @@ export default class Servicios {
         return response;
     }
 
-    async getVotacion(id) {
-        let response = await Axios.get('/votacion/' + id);
+    async getVotacion(idVotacion, idUsuario) {
+        let response = await Axios.get(`/votacion/${idVotacion}/${idUsuario}`);
         return response;
     }
 
@@ -93,12 +93,14 @@ export default class Servicios {
         return response;
     }
 
-    async enviarVoto(idVotacion,tokenVotacion,idPapeleta,idOpcion, usuario) {
+    async enviarVoto(idVotacion,tokenVotacion,idPapeleta,idPorigen,opcion, idUsuario ,usuario) {
         let response= await Axios.post('/voto',{
             votacion:idVotacion,
             tokenVotacion:tokenVotacion,
             papeleta:idPapeleta,
-            opcion:idOpcion,
+            papeletaOrigen:idPorigen,
+            opcion:opcion,
+            idUsuario:idUsuario,
             usuario:usuario
         });
         return response;

@@ -69,6 +69,7 @@ router.beforeEach((to, from, next) => {
             }
 
             serv.validarToken(t, { tipo: tipo }).then(respuesta => {
+                
                 if (respuesta.data.estado) {
                     next();
                 } else {

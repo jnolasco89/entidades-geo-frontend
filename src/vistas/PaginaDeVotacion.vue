@@ -15,7 +15,7 @@
           id="btn-titulo"
         ></v-skeleton-loader>
         <span v-else class="hidden-sm-and-down">
-          <h2>{{papeletaActual.titulo}}</h2>
+          <h2 v-text="papeletaActual.titulo"></h2>
         </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
@@ -27,6 +27,11 @@
     <v-main>
       <v-container class="pa-12 grey lighten-4" fluid fill-height v-if="iniciandoData">
         <v-row class="fill-height" justify="center">
+          <v-col cols="12">
+            <div class="text-center" style="padding-top:20px;">
+              <v-skeleton-loader ref="skeleton" :boilerplate="false" type="button" :tile="false"></v-skeleton-loader>
+            </div>
+          </v-col>
           <v-col cols="12">
             <div class="text-center" style="padding-top:20px;">
               <v-skeleton-loader ref="skeleton" :boilerplate="false" type="button" :tile="false"></v-skeleton-loader>
@@ -81,7 +86,21 @@
                 <v-row align="start">
                   <v-col cols="12">
                     <div class="text-center" style="padding-top:20px;">
-                      <v-btn color="primary" @click="votar" rounded elevation="24" large>
+                      <v-btn color="error" @click="cerrarSesion" text>
+                        <v-icon left>power_settings_new</v-icon>Salir
+                      </v-btn>
+                    </div>
+                  </v-col>
+                  <v-col cols="12">
+                    <div class="text-center" style="padding-top:20px;">
+                      <v-btn
+                        color="primary"
+                        @click="votar"
+                        rounded
+                        elevation="24"
+                        large
+                        :disabled="botonDeshabilitado"
+                      >
                         <v-icon left>done</v-icon>Votar
                       </v-btn>
                     </div>
@@ -189,38 +208,54 @@
           </v-container>
           <v-container fluid class="pa-12 grey lighten-4" fill-height v-if="papeleta.marcada">
             <v-row align="start" justify="center">
-              <v-card outlined>
-                <v-card-title class="justify-center">Voto ya emitido para esta elección</v-card-title>
-                <v-card-text>
-                  <v-row justify="center">
-                    <v-col cols="12">
-                      <h3 class="text-center">Usted votó por</h3>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-card outlined color="#fff">
-                        <v-card-title class="justify-center">{{papeleta.opcionSeleccionada.nombre}}</v-card-title>
-                        <v-card-text>
-                          <v-row>
-                            <v-col cols="12">
-                              <v-img
-                                :src="`http://localhost:8082/descargar/${papeleta.opcionSeleccionada.foto}`"
-                                style="margin: 0px auto;"
-                                width="200"
-                                height="250"
-                              ></v-img>
-                            </v-col>
-                            <v-col cols="12">
-                              <p
-                                style="width:50%;margin:0px auto;"
-                              >{{papeleta.opcionSeleccionada.wiki.descripcion}}</p>
-                            </v-col>
-                          </v-row>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
+              <v-col cols="12">
+                <div class="text-center" style="padding-top:20px;">
+                  <v-btn color="error" @click="cerrarSesion" text>
+                    <v-icon left>power_settings_new</v-icon>Salir
+                  </v-btn>
+                </div>
+              </v-col>
+              <v-col cols="12">
+                <v-card outlined color="#fff" elevation="12">
+                  <v-card-title
+                    class="justify-center"
+                    style="color:black;"
+                  >Voto ya emitido para esta elección</v-card-title>
+                  <v-card-text>
+                    <v-row justify="center">
+                      <v-col cols="12">
+                        <h3 class="text-center" style="color:black;">Usted votó por</h3>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-card outlined color="#fff">
+                          <v-card-title
+                            class="justify-center"
+                            style="color:black;"
+                          >{{papeleta.opcionMarcada.nombre}}</v-card-title>
+                          <v-card-text>
+                            <v-row>
+                              <v-col cols="12">
+                                <v-img
+                                  :src="`http://localhost:8082/descargar/${papeleta.opcionMarcada.nombreFoto}`"
+                                  style="margin: 0px auto;"
+                                  width="200"
+                                  height="250"
+                                ></v-img>
+                              </v-col>
+                              <v-col cols="12">
+                                <div
+                                  style="width:50%;margin:0px auto; color:black;"
+                                  v-html="papeleta.opcionMarcada.wiki.descripcion"
+                                ></div>
+                              </v-col>
+                            </v-row>
+                          </v-card-text>
+                        </v-card>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
             </v-row>
           </v-container>
         </v-carousel-item>
@@ -229,7 +264,7 @@
     <v-dialog v-model="cargando" persistent width="300">
       <v-card color="success" dark>
         <v-card-text>
-          <h4>Cargando...</h4>
+          <h4>{{txtModalCargando}}</h4>
           <v-progress-linear indeterminate color="white" class="mb-0"></v-progress-linear>
         </v-card-text>
       </v-card>
@@ -275,7 +310,7 @@ export default {
   mounted() {
     this.cargaInicial().then(() => {
       this.cargando = false;
-      this.iniciandoData=false;
+      this.iniciandoData = false;
     });
   },
   beforeMount() {},
@@ -283,6 +318,7 @@ export default {
     return {
       cargando: true,
       iniciandoData: true,
+      txtModalCargando: "Cargando...",
       indexPapeletaActual: 0,
       papeletas: [],
       papeletaActual: {},
@@ -291,22 +327,33 @@ export default {
       tituloWiki: "Indicaciones",
       dialogConfirmarVoto: false,
       dialogInformacion: false,
+      botonDeshabilitado: false,
       opcionSelecionada: {
         wiki: {
           titulo: null,
           descripcion: null
         }
       },
-      votacion:null
+      votacion: null
     };
   },
   methods: {
     async cargaInicial() {
       let usuario = JSON.parse(localStorage.getItem("usuario"));
-      let respuesta = await serv.getVotacion(usuario.votacion).then(r => {
-        this.votacion = r.data;
-        this.papeletas = this.votacion.papeletas;
-        this.papeletaActual = this.votacion.papeletas[0];
+      let respuesta = await serv
+        .getVotacion(usuario.votacion, usuario.id)
+        .then(r => {
+          this.votacion = r.data;
+          this.papeletas = this.votacion.papeletas;
+          this.papeletaActual = this.votacion.papeletas[0];
+        });
+    },
+    cerrarSesion(){
+      let t=localStorage.getItem('t');
+      serv.cerrarSesion(t).then(()=>{
+        localStorage.removeItem('t');
+        localStorage.removeItem('usuario');
+        this.$router.push({ name: 'LoginVotacion',params:{votacion:this.votacion.id} });
       });
     },
     seleccionarContendiente(opcion) {
@@ -315,14 +362,16 @@ export default {
       this.tituloWiki = "Candidato";
     },
     votar() {
-      if (
-        this.opcionSelecionada.valor != undefined
-          ? this.opcionSelecionada.valor > 0
-          : false
-      ) {
-        this.dialogConfirmarVoto = true;
-      } else {
-        this.dialogInformacion = true;
+      if (!this.cargando) {
+        if (
+          this.opcionSelecionada.valor != undefined
+            ? this.opcionSelecionada.valor > 0
+            : false
+        ) {
+          this.dialogConfirmarVoto = true;
+        } else {
+          this.dialogInformacion = true;
+        }
       }
     },
     siguientePapeleta() {
@@ -338,19 +387,26 @@ export default {
       this.tituloWiki = "Indicaciones";
     },
     enviarVoto() {
-      //alert(this.opcionSelecionada.valor);
-      let usuario = JSON.parse(localStorage.getItem("usuario"));
-      serv.enviarVoto(this.votacion.id,this.votacion.token,this.papeletaActual.id,this.opcionSelecionada.valor,usuario.usuario)
-      //alert(t);
-      /*
       this.dialogConfirmarVoto = false;
-      this.papeletas[this.indexPapeletaActual].marcada = true;
-      this.papeletas[
-        this.indexPapeletaActual
-      ].opcionSeleccionada = this.opcionSelecionada;
-      this.papeletaActual = this.papeletas[this.indexPapeletaActual];
-      this.papeletaActual.opcionSeleccionada = this.opcionSelecionada;
-      */
+      this.botonDeshabilitado = true;
+      this.txtModalCargando = "Procesando voto...";
+      this.cargando = true;
+      let usuario = JSON.parse(localStorage.getItem("usuario"));
+      serv
+        .enviarVoto(
+          this.votacion.id,
+          this.votacion.token,
+          this.papeletaActual.id,
+          this.papeletaActual.idPorigen,
+          this.opcionSelecionada,
+          usuario.id,
+          usuario.usuario
+        )
+        .then(r => {
+          this.papeletaActual = r.data;
+          this.papeletas[this.indexPapeletaActual] = this.papeletaActual;
+          this.cargando = false;
+        });
     }
   }
 };

@@ -116,16 +116,18 @@
             </template>
             <template slot="acciones" slot-scope="datos">
               <v-row>
-                <v-col cols="6" sm="3" md="12">
+                <v-col cols="12" sm="12" md="12">
                   <v-btn class="ma-2" text color="primary" @click="verDetallesEntidad(datos.item)">
                     <v-icon left>info</v-icon>Detalles
                   </v-btn>
                 </v-col>
+                <!--
                 <v-col cols="6" sm="3" md="12">
                   <v-btn class="ma-2" text color="primary" @click="generarReporte(datos.item.id)">
                     <v-icon left>picture_as_pdf</v-icon>Reporte
                   </v-btn>
                 </v-col>
+                -->
               </v-row>
             </template>
           </lista-paginacion>
@@ -374,12 +376,15 @@ export default {
     generarReporte(id) {
       this.verModalCargando = true;
       serv.getReporteEntidad(id).then(respuesta => {
+        console.log(respuesta);
+        /*
         const url = window.URL.createObjectURL(new Blob([respuesta.data]));
 
         let archivo = new Blob([respuesta.data], { type: "application/pdf" });
         let archivoURL = window.URL.createObjectURL(archivo);
         this.verModalCargando = false;
         window.open(archivoURL);
+        */
       });
     },
     async cargaInicial() {

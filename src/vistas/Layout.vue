@@ -35,7 +35,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content>
+    <v-main>
       <v-container fluid class="pa-12 grey lighten-4" fill-height>
         <v-row align="center" justify="center">
           <v-col cols="12">
@@ -61,7 +61,7 @@
         </v-row>
         -->
       </v-container>
-    </v-content>
+    </v-main>
 
     <v-dialog v-model="verModalCargando" persistent width="300">
       <v-card color="success" dark>
